@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:secure="http://www.liquibase.org/xml/ns/secure"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/secure
+        http://www.liquibase.org/xml/ns/secure/liquibase-secure-latest.xsd">
+
+
+<!-- Tabla destino -->
+<changeSet id="1" author="alesh">
+    <createTable tableName="destino">
+        <column name="id" type="BIGINT" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false" />
+        </column>
+        <column name="nombre" type="VARCHAR(255)"/>
+        <column name="pais" type="VARCHAR(255)"/>
+    </createTable>
+</changeSet>
+
+<!-- Tabla viaje -->
+<changeSet id="2" author="alesh">
+    <createTable tableName="viaje">
+        <column name="id" type="BIGINT" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false" />
+        </column>
+        <column name="fecha_inicio" type="DATE"/>
+        <column name="fecha_fin" type="DATE"/>
+        <column name="precio" type="DOUBLE"/>
+        <column name="destino_id" type="BIGINT">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+
+    <addForeignKeyConstraint 
+        baseTableName="viaje" 
+        baseColumnNames="destino_id"
+        constraintName="fk_viaje_destino"
+        referencedTableName="destino"
+        referencedColumnNames="id"/>
+</changeSet>
+
+<!-- Datos -->
+<changeSet id="3" author="alesh">
+    <insert tableName="destino">
+        <column name="nombre" value="Delhi"/>
+        <column name="pais" value="India"/>
+    </insert>
+    <insert tableName="destino">
+        <column name="nombre" value="Kerala"/>
+        <column name="pais" value="India"/>
+    </insert>
+    <insert tableName="destino">
+        <column name="nombre" value="Bangkok"/>
+        <column name="pais" value="Tailandia"/>
+    </insert>
+    <insert tableName="destino">
+        <column name="nombre" value="Bali"/>
+        <column name="pais" value="Indonesia"/>
+    </insert>
+    <insert tableName="destino">
+        <column name="nombre" value="Río de Janeiro"/>
+        <column name="pais" value="Brasil"/>
+    </insert>
+</changeSet>
+
+<!-- Poblar 5 viajes -->
+<changeSet id="4" author="alesh">
+    <insert tableName="viaje">
+        <column name="fecha_inicio" value="2024-03-15"/>
+        <column name="fecha_fin" value="2024-03-25"/>
+        <column name="precio" value="1200.50"/>
+        <column name="destino_id" value="1"/>
+    </insert>
+    <insert tableName="viaje">
+        <column name="fecha_inicio" value="2024-04-10"/>
+        <column name="fecha_fin" value="2024-04-20"/>
+        <column name="precio" value="1450.75"/>
+        <column name="destino_id" value="2"/> 
+    </insert>
+    <insert tableName="viaje">
+        <column name="fecha_inicio" value="2024-05-05"/>
+        <column name="fecha_fin" value="2024-05-12"/>
+        <column name="precio" value="980.25"/>
+        <column name="destino_id" value="3"/> 
+    </insert>
+    <insert tableName="viaje">
+        <column name="fecha_inicio" value="2024-06-01"/>
+        <column name="fecha_fin" value="2024-06-10"/>
+        <column name="precio" value="1100.00"/>
+        <column name="destino_id" value="4"/>
+    </insert>
+    <insert tableName="viaje">
+        <column name="fecha_inicio" value="2024-07-15"/>
+        <column name="fecha_fin" value="2024-07-25"/>
+        <column name="precio" value="1300.00"/>
+        <column name="destino_id" value="5"/> 
+    </insert>
+</changeSet>
+
+</databaseChangeLog>
