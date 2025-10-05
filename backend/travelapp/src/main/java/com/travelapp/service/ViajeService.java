@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.travelapp.dto.ViajeDTO;
+import com.travelapp.exception.EntityNotFoundException;
+import com.travelapp.exception.ValidationException;
 import com.travelapp.mapper.ViajeMapper;
 import com.travelapp.model.Destino;
 import com.travelapp.model.Viaje;
@@ -48,7 +50,7 @@ public class ViajeService {
         Viaje viaje = viajeRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("Viaje no encontrado con ID: {}", id);
-                return new RuntimeException("Viaje no encontrado");
+                return new EntityNotFoundException("Viaje no encontrado");
             });
         
         log.info("Viaje encontrado: {}", viaje.getId());
@@ -64,7 +66,7 @@ public class ViajeService {
         Destino destino = destinoRepository.findById(viajeDTO.getDestinoId())
             .orElseThrow(() -> {
                 log.warn("Destino no encontrado con ID: {}", viajeDTO.getDestinoId());
-                return new RuntimeException("Destino no encontrado");
+                return new EntityNotFoundException("Destino no encontrado");
             });
 
         // Validar fechas
@@ -84,17 +86,18 @@ public class ViajeService {
     public ViajeDTO update(Long id, ViajeDTO viajeDTO) {
         log.debug("Actualizando viaje con ID: {}", id);
 
+        // Validar viaje
         Viaje viajeExistente = viajeRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("Viaje no encontrado con ID: {}", id);
-                return new RuntimeException("Viaje no encontrado");
+                return new EntityNotFoundException("Viaje no encontrado");
             });
 
         // Validar destino
         Destino destino = destinoRepository.findById(viajeDTO.getDestinoId())
             .orElseThrow(() -> {
                 log.warn("Destino no encontrado con ID: {}", viajeDTO.getDestinoId());
-                return new RuntimeException("Destino no encontrado");
+                return new EntityNotFoundException("Destino no encontrado");
             });
         viajeExistente.setDestino(destino);
         
@@ -118,7 +121,7 @@ public class ViajeService {
 
         if (!viajeRepository.existsById(id)) {
             log.warn("Intento de eliminar viaje no existente con ID: {}", id);
-            throw new RuntimeException("Viaje no encontrado");
+            throw new EntityNotFoundException("Viaje no encontrado");
         }
 
         viajeRepository.deleteById(id);
@@ -142,17 +145,17 @@ public class ViajeService {
     private void validateFechas(LocalDate fechaInicio, LocalDate fechaFin) {
         if (fechaInicio == null || fechaFin == null) {
             log.warn("Las fechas de inicio y fin no pueden ser nulas");
-            throw new RuntimeException("Las fechas de inicio y fin no pueden ser nulas");
+            throw new ValidationException("Las fechas de inicio y fin no pueden ser nulas");
         }
 
         if (fechaInicio.isAfter(fechaFin)) {
             log.warn("La fecha de inicio no puede ser posterior a la fecha de fin");
-            throw new RuntimeException("La fecha de inicio no puede ser posterior a la fecha de fin");
+            throw new ValidationException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
 
         if (fechaInicio.isBefore(LocalDate.now())) {
             log.warn("La fecha de inicio no puede ser en el pasado");
-            throw new RuntimeException("La fecha de inicio no puede ser en el pasado");
+            throw new ValidationException("La fecha de inicio no puede ser en el pasado");
         }
     }
     

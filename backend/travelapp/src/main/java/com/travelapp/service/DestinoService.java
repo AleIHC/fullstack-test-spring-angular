@@ -1,11 +1,14 @@
 package com.travelapp.service;
 
 import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.travelapp.dto.DestinoDTO;
+import com.travelapp.exception.DuplicateEntityException;
+import com.travelapp.exception.EntityNotFoundException;
 import com.travelapp.mapper.DestinoMapper;
 import com.travelapp.model.Destino;
 import com.travelapp.repository.DestinoRepository;
@@ -42,7 +45,7 @@ public class DestinoService {
         Destino destino = destinoRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("Destino no encontrado con ID: {}", id);
-                return new RuntimeException("Destino no encontrado");
+                return new EntityNotFoundException("Destino no encontrado");
             });
         
         log.info("Destino encontrado: {}", destino.getNombre());
@@ -57,7 +60,7 @@ public class DestinoService {
         // Validar duplicados 
         if (destinoRepository.existsByNombreIgnoreCase(destinoDTO.getNombre())) {
             log.warn("El destino con nombre '{}' ya existe", destinoDTO.getNombre());
-            throw new RuntimeException("El destino ya existe");
+            throw new DuplicateEntityException("El destino ya existe");
         }
 
         Destino destino = destinoMapper.toEntity(destinoDTO);
@@ -75,14 +78,14 @@ public class DestinoService {
         Destino destinoExistente = destinoRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("Destino no encontrado con ID: {}", id);
-                return new RuntimeException("Destino no encontrado");
+                return new EntityNotFoundException("Destino no encontrado");
             });
 
         // Validar duplicados 
         if (!destinoExistente.getNombre().equalsIgnoreCase(destinoDTO.getNombre()) &&
             destinoRepository.existsByNombreIgnoreCase(destinoDTO.getNombre())) {
             log.warn("Intento de actualizar destino con nombre '{}' que ya existe", destinoDTO.getNombre());
-            throw new RuntimeException("El destino ya existe");
+            throw new DuplicateEntityException("El destino ya existe");
         }
 
         destinoExistente.setNombre(destinoDTO.getNombre());
@@ -101,7 +104,7 @@ public class DestinoService {
 
         if (!destinoRepository.existsById(id)) {
             log.warn("Intento de eliminar destino no existente con ID: {}", id);
-            throw new RuntimeException("Destino no encontrado");
+            throw new EntityNotFoundException("Destino no encontrado");
         }
 
         destinoRepository.deleteById(id);
