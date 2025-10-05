@@ -1,0 +1,65 @@
+<div class="destino-modal">
+  <h2 mat-dialog-title>
+    <mat-icon>{{ data.isEdit ? 'edit' : 'add' }}</mat-icon>
+    {{ titulo }}
+  </h2>
+
+  <form [formGroup]="destinoForm" (ngSubmit)="onSubmit()">
+    <mat-dialog-content>
+      <!-- Error message -->
+      <div *ngIf="error" class="error-message">
+        <mat-icon>error</mat-icon>
+        {{ error }}
+      </div>
+
+      <!-- Nombre field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre del destino</mat-label>
+        <input matInput 
+               formControlName="nombre" 
+               placeholder="Ej: Bogotá, París, Tokio">
+        <mat-icon matSuffix>location_city</mat-icon>
+        
+        <!-- Error messages -->
+        <mat-error *ngIf="nombreControl?.hasError('required')">
+          El nombre es requerido
+        </mat-error>
+        <mat-error *ngIf="nombreControl?.hasError('minlength')">
+          El nombre debe tener al menos 2 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <!-- País field -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>País</mat-label>
+        <input matInput 
+               formControlName="pais" 
+               placeholder="Ej: Colombia, Francia, Japón">
+        <mat-icon matSuffix>flag</mat-icon>
+        
+        <!-- Error messages -->
+        <mat-error *ngIf="paisControl?.hasError('required')">
+          El país es requerido
+        </mat-error>
+        <mat-error *ngIf="paisControl?.hasError('minlength')">
+          El país debe tener al menos 2 caracteres
+        </mat-error>
+      </mat-form-field>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button mat-button type="button" (click)="onCancel()" [disabled]="loading">
+        Cancelar
+      </button>
+      
+      <button mat-raised-button 
+              color="primary" 
+              type="submit" 
+              [disabled]="destinoForm.invalid || loading">
+        <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
+        <mat-icon *ngIf="!loading">{{ data.isEdit ? 'save' : 'add' }}</mat-icon>
+        {{ submitButtonText }}
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

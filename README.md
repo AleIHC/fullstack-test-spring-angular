@@ -23,11 +23,22 @@ Tecnologías: Java 17, Spring Boot 3, Angular LTS, PostgreSQL, Docker.
 - Bean Validation
 - Lombok
 
-## 🚀 Cómo ejecutar
+**Frontend:**
+- Angular 19 (LTS)
+- Angular Material
+- TypeScript
+- RxJS
+- Jasmine + Karma (tests)
+- HttpClient
+- Reactive Forms
+
+## 🚀 Cómo ejecutar Backend
 
 ### Prerrequisitos
 - Java 17+
 - Maven 3.6+
+- Node.js 18+
+- npm 9+
 - PostgreSQL 12+ (para perfil local)
 
 ### 1. Base de datos local
@@ -106,3 +117,9 @@ Content-Type: application/json
 - Mappers: 14 tests  
 - Exception Handlers: 4 tests
 - Cobertura: 81.375%
+
+## 🚀 Cómo ejecutar Frontend
+```bash
+cd frontend/travel-app
+npm install
+npm start          # o alternativamente: ng serve

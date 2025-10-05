@@ -1,0 +1,114 @@
+<div class="container">
+    <div class="header">
+        <h1>Gestión de Destinos</h1>
+        
+        <!-- Búsqueda -->
+        <div class="search-container">
+            <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Buscar por país</mat-label>
+                <input matInput 
+                        [(ngModel)]="searchTerm" 
+                        (keyup.enter)="buscarDestinos()"
+                        placeholder="Ejemplo: Colombia, Argentina...">
+                <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+            
+            <button mat-raised-button color="primary" (click)="buscarDestinos()">
+                <mat-icon>search</mat-icon>
+                Buscar
+            </button>
+            
+            <button mat-stroked-button (click)="limpiarBusqueda()" *ngIf="searchTerm">
+                <mat-icon>clear</mat-icon>
+                Limpiar
+            </button>
+        </div>
+        
+        <button mat-raised-button color="accent" class="add-button" (click)="crearDestino()">
+            <mat-icon>add</mat-icon>
+            Nuevo Destino
+        </button>
+    </div>
+
+    <!-- Indicador de carga -->
+    <div *ngIf="loading" class="loading">
+        <mat-icon>hourglass_empty</mat-icon>
+        Cargando destinos...
+    </div>
+
+    <!-- Mensaje de error -->
+    <div *ngIf="error" class="error">
+        <mat-icon>error</mat-icon>
+        {{ error }}
+    </div>
+
+    <!-- Tabla -->
+    <div *ngIf="!loading && !error" class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSort($event)" class="destinos-table">
+        
+            <!-- Columna ID -->
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+                <td mat-cell *matCellDef="let destino">{{ destino.id }}</td>
+            </ng-container>
+
+            <!-- Columna Nombre -->
+            <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+                <td mat-cell *matCellDef="let destino">{{ destino.nombre }}</td>
+            </ng-container>
+
+            <!-- Columna País -->
+            <ng-container matColumnDef="pais">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>País</th>
+                <td mat-cell *matCellDef="let destino">{{ destino.pais }}</td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td mat-cell *matCellDef="let destino" class="actions-cell">
+                    <button mat-icon-button color="primary" matTooltip="Ver detalles" (click)="verDestino(destino.id!)">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                    
+                    <button mat-icon-button color="accent" matTooltip="Editar" (click)="editarDestino(destino.id!)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    
+                    <button mat-icon-button 
+                            color="warn" 
+                            matTooltip="Eliminar"
+                            (click)="eliminarDestino(destino.id!)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <!-- Header y filas -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+        </table>
+
+        <!-- Paginación -->
+        <mat-paginator 
+            [length]="totalElements"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="[5, 10, 20, 50]"
+            [pageIndex]="pageIndex"
+            (page)="onPageChange($event)"
+            showFirstLastButtons
+            class="paginator">
+        </mat-paginator>
+    </div>
+
+    <!-- Mensaje cuando no hay datos -->
+    <div *ngIf="!loading && !error && destinos.length === 0" class="no-data">
+        <mat-icon>inbox</mat-icon>
+        <p>No hay destinos para mostrar</p>
+        <p *ngIf="searchTerm" class="search-hint">
+            Intenta con otro término de búsqueda o 
+            <button mat-button color="primary" (click)="limpiarBusqueda()">limpia la búsqueda</button>
+        </p>
+    </div>
+</div>
