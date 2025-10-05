@@ -73,7 +73,6 @@
     		<artifactId>h2</artifactId>
     		<scope>test</scope>
 		</dependency>
-	
 	</dependencies>
 
 	<build>
@@ -107,6 +106,12 @@
     			<groupId>org.jacoco</groupId>
     			<artifactId>jacoco-maven-plugin</artifactId>
     			<version>0.8.13</version>
+				<configuration>
+					<excludes>
+						<exclude>com/travelapp/controller/**</exclude>
+						<exclude>com/travelapp/TravelappApplication.class</exclude>
+					</excludes>
+				</configuration>
     			<executions>
         			<execution>
         			    <goals>

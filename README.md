@@ -99,3 +99,10 @@ Content-Type: application/json
     "destinoId": 1
 }
 ```
+
+### Estadísticas de unit tests
+- Total tests: 41
+- Services: 22 tests
+- Mappers: 14 tests  
+- Exception Handlers: 4 tests
+- Cobertura: 81.375%
