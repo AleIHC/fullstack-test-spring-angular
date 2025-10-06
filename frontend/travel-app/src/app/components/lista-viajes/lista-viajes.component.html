@@ -1,0 +1,175 @@
+<div class="lista-viajes-container">
+    <!-- Encabezado y Filtros -->
+    <div class="header-section">
+        <h1 class="page-title">
+        <mat-icon>flight_takeoff</mat-icon>
+        Nuestros Viajes
+        </h1>
+        <p class="page-subtitle">Descubre destinos increíbles con las mejores ofertas</p>
+    </div>
+
+    <!-- Panel de Filtros -->
+    <div class="filtros-panel">
+        <mat-form-field appearance="outline" class="filtro-busqueda">
+        <mat-label>Buscar destino</mat-label>
+        <input matInput 
+                [(ngModel)]="searchTerm" 
+                (ngModelChange)="onFiltroChange()"
+                placeholder="París, Roma, Bali...">
+        <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filtro-destino">
+        <mat-label>Filtrar por destino</mat-label>
+        <mat-select [(ngModel)]="filtroDestino" (selectionChange)="onFiltroChange()">
+            <mat-option value="">Todos los destinos</mat-option>
+            <mat-option *ngFor="let destino of destinos" [value]="destino.nombre">
+            {{destino.nombre}}, {{destino.pais}}
+            </mat-option>
+        </mat-select>
+        </mat-form-field>
+
+        <div class="filtro-precio">
+        <label class="precio-label" for="precioMaxSlider">Precio máximo: ${{filtroPrecioMax}}</label>
+        <mat-slider 
+            id="precioMaxSlider"
+            [min]="0" 
+            [max]="3000" 
+            [step]="100"
+            [(ngModel)]="filtroPrecioMax"
+            (input)="onFiltroChange()"
+            class="precio-slider">
+        </mat-slider>
+        </div>
+
+        <button mat-stroked-button 
+                color="primary" 
+                (click)="limpiarFiltros()"
+                class="btn-limpiar">
+        <mat-icon>clear</mat-icon>
+        Limpiar Filtros
+        </button>
+    </div>
+
+    <!-- Indicador de Carga -->
+    <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Cargando viajes...</p>
+    </div>
+
+    <!-- Mensaje de Error -->
+    <div *ngIf="error" class="error-container">
+        <mat-icon color="warn">error</mat-icon>
+        <p>{{error}}</p>
+        <button mat-raised-button color="primary" (click)="recargarViajes()">
+        Reintentar
+        </button>
+    </div>
+
+    <!-- Grid de Viajes -->
+    <div *ngIf="!loading && !error" class="viajes-grid">
+        <div class="resultados-info">
+        <p>{{viajesFiltrados.length}} viaje(s) encontrado(s)</p>
+        </div>
+
+        <!-- Cards de Viajes -->
+        <div class="cards-container">
+        <mat-card *ngFor="let viaje of viajesFiltrados" 
+                    class="viaje-card"
+                    [class.oferta]="esOferta(viaje)">
+            
+            <!-- Header de la Card -->
+            <div class="card-header">
+            <div class="destino-imagen">
+                <mat-icon class="destino-icon">place</mat-icon>
+            </div>
+            <mat-chip *ngIf="esOferta(viaje)" 
+                    class="chip-oferta" 
+                    color="accent">
+                <mat-icon>local_offer</mat-icon>
+                ¡Oferta!
+            </mat-chip>
+            </div>
+
+            <mat-card-content class="card-content">
+            <!-- Información del Destino -->
+            <div class="destino-info">
+                <h3 class="destino-nombre">{{getDestinoNombre(viaje)}}</h3>
+                <p class="destino-pais">
+                <mat-icon>public</mat-icon>
+                {{getDestinoPais(viaje)}}
+                </p>
+            </div>
+
+            <!-- Información de Fechas -->
+            <div class="fechas-info">
+                <div class="fecha-item">
+                <mat-icon>event</mat-icon>
+                <div class="fecha-details">
+                    <span class="fecha-label">Fechas del viaje</span>
+                    <span class="fecha-rango">
+                    {{viaje.fechaInicio | date:'dd MMM'}} - {{viaje.fechaFin | date:'dd MMM yyyy'}}
+                    </span>
+                </div>
+                </div>
+                <div class="duracion-chip">
+                <mat-chip class="duracion">
+                    <mat-icon>schedule</mat-icon>
+                    {{getDuracionViaje(viaje)}} días
+                </mat-chip>
+                </div>
+            </div>
+
+            <!-- Información de Precio -->
+            <div class="precio-section">
+                <div class="precio-principal">
+                <span class="precio-valor">${{viaje.precio | number:'1.0-0'}}</span>
+                <span class="precio-moneda">USD</span>
+                </div>
+                <p class="precio-detalle">por persona</p>
+            </div>
+            </mat-card-content>
+
+            <!-- Acciones de la Card -->
+            <mat-card-actions class="card-actions">
+            <button mat-raised-button 
+                    color="primary" 
+                    (click)="verDetalleViaje(viaje)"
+                    class="btn-primary">
+                <mat-icon>visibility</mat-icon>
+                Ver Detalles
+            </button>
+            
+            <button mat-button 
+                    color="accent" 
+                    (click)="editarViaje(viaje)"
+                    class="btn-secondary">
+                <mat-icon>edit</mat-icon>
+                Editar
+            </button>
+            
+            <button mat-icon-button 
+                    color="warn" 
+                    (click)="eliminarViaje(viaje)"
+                    class="btn-delete"
+                    matTooltip="Eliminar viaje">
+                <mat-icon>delete</mat-icon>
+            </button>
+            </mat-card-actions>
+        </mat-card>
+        </div>
+
+        <!-- Estado Vacío -->
+        <div *ngIf="viajesFiltrados.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">flight_land</mat-icon>
+        <h3>No se encontraron viajes</h3>
+        <p>Intenta ajustar los filtros o crear un nuevo viaje</p>
+        <button mat-raised-button 
+                color="primary"
+                (click)="crearNuevoViaje()">
+            <mat-icon>add</mat-icon>
+            Crear Nuevo Viaje
+        </button>
+        </div>
+    </div>
+</div>

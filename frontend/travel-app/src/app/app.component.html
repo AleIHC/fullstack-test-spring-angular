@@ -1,10 +1,34 @@
 <div class="app-container">
-  <header class="app-header">
-    <h1>Travel App</h1>
-    <p>Gestión de Destinos y Viajes</p>
-  </header>
-  
-  <main class="app-main">
-    <app-lista-destinos></app-lista-destinos>
+  <!-- Navegación Principal -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <mat-icon>flight</mat-icon>
+        <h1>Travel App</h1>
+      </div>
+      
+      <div class="nav-links">
+        <a mat-raised-button 
+            color="primary" 
+            routerLink="/destinos" 
+            routerLinkActive="active">
+          <mat-icon>place</mat-icon>
+          Destinos
+        </a>
+        
+        <a mat-raised-button 
+            color="accent" 
+            routerLink="/viajes" 
+            routerLinkActive="active">
+          <mat-icon>flight_takeoff</mat-icon>
+          Viajes
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenido Principal -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
   </main>
 </div>

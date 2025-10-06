@@ -8,13 +8,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; 
+import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { DestinoModalComponent, DestinoModalData } from '../destino-modal/destino-modal.component';
 
 import { DestinoService } from '../../services/destino.service';
 import { Destino, RespuestaPaginada } from '../../models';
-
 
 
 @Component({
@@ -29,6 +30,8 @@ import { Destino, RespuestaPaginada } from '../../models';
     MatFormFieldModule,
     MatSortModule,
     MatTooltipModule,
+    MatProgressSpinnerModule,
+    MatChipsModule,
     FormsModule
   ],
   templateUrl: './lista-destinos.component.html',
@@ -42,7 +45,7 @@ export class ListaDestinosComponent implements OnInit {
   error: string | null = null;
 
   // Tabla
-  displayedColumns: string[] = ['id', 'nombre', 'pais', 'acciones'];
+  displayedColumns: string[] = ['id', 'nombre', 'pais', 'estado', 'acciones'];
 
   // Paginación
   totalElements: number = 0;

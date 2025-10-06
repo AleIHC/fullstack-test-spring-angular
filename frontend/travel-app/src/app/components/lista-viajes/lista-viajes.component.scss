@@ -1,0 +1,519 @@
+// Variables de colores y espaciado
+:root {
+    --primary-color: #1976d2;
+    --accent-color: #ff4081;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --background-light: #fafafa;
+    --shadow-light: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-medium: 0 4px 8px rgba(0,0,0,0.15);
+    --shadow-heavy: 0 8px 16px rgba(0,0,0,0.2);
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.lista-viajes-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+
+  // Header Section
+    .header-section {
+        text-align: center;
+        margin-bottom: 32px;
+        padding: 32px 0;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-light);
+
+        .page-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: var(--primary-color);
+        margin: 0 0 8px 0;
+
+        mat-icon {
+            font-size: 2.5rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            color: var(--accent-color);
+        }
+        }
+
+        .page-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin: 0;
+        font-weight: 400;
+        }
+    }
+
+    // Panel de Filtros
+    .filtros-panel {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: flex-end;
+        background: white;
+        padding: 24px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-light);
+        margin-bottom: 24px;
+
+        .filtro-busqueda {
+        flex: 1;
+        min-width: 250px;
+        }
+
+        .filtro-destino {
+        flex: 1;
+        min-width: 200px;
+        }
+
+        .filtro-precio {
+        flex: 1;
+        min-width: 200px;
+        padding: 0 8px;
+
+        .precio-label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .precio-slider {
+            width: 100%;
+        }
+        }
+
+        .btn-limpiar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 56px;
+        transition: var(--transition);
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        }
+    }
+
+    // Estados de carga y error
+    .loading-container,
+    .error-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-light);
+        text-align: center;
+
+        mat-icon {
+        font-size: 3rem;
+        width: 3rem;
+        height: 3rem;
+        margin-bottom: 16px;
+        }
+
+        p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+        }
+    }
+
+    .error-container {
+        mat-icon {
+        color: var(--error-color);
+        }
+    }
+
+    // Grid de Viajes
+    .viajes-grid {
+        .resultados-info {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 12px 20px;
+        border-radius: var(--border-radius);
+        margin-bottom: 24px;
+        backdrop-filter: blur(10px);
+
+        p {
+            margin: 0;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        }
+
+        // Container de Cards
+        .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+
+        // Card Individual de Viaje
+        .viaje-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+
+            &:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-heavy);
+            }
+
+            // Card con oferta
+            &.oferta {
+            border: 2px solid var(--accent-color);
+            
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--accent-color), var(--warning-color));
+            }
+            }
+
+            // Header de la Card
+            .card-header {
+            position: relative;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), #1565c0);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            .destino-imagen {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 60px;
+                height: 60px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 50%;
+                backdrop-filter: blur(10px);
+
+                .destino-icon {
+                font-size: 2rem;
+                width: 2rem;
+                height: 2rem;
+                color: white;
+                }
+            }
+
+            .chip-oferta {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                background: var(--accent-color);
+                color: white;
+                font-weight: 600;
+                animation: pulse 2s infinite;
+
+                mat-icon {
+                font-size: 1rem;
+                width: 1rem;
+                height: 1rem;
+                }
+            }
+            }
+
+            // Contenido de la Card
+            .card-content {
+            padding: 24px;
+
+            // Información del Destino
+            .destino-info {
+                margin-bottom: 20px;
+
+                .destino-nombre {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin: 0 0 8px 0;
+                }
+
+                .destino-pais {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: var(--text-secondary);
+                font-size: 0.95rem;
+                margin: 0;
+
+                mat-icon {
+                    font-size: 1.2rem;
+                    width: 1.2rem;
+                    height: 1.2rem;
+                }
+                }
+            }
+
+            // Información de Fechas
+            .fechas-info {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding: 16px;
+                background: var(--background-light);
+                border-radius: 8px;
+
+                .fecha-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+
+                mat-icon {
+                    color: var(--primary-color);
+                    font-size: 1.2rem;
+                    width: 1.2rem;
+                    height: 1.2rem;
+                }
+
+                .fecha-details {
+                    display: flex;
+                    flex-direction: column;
+
+                    .fecha-label {
+                    font-size: 0.8rem;
+                    color: var(--text-secondary);
+                    text-transform: uppercase;
+                    font-weight: 500;
+                    letter-spacing: 0.5px;
+                    }
+
+                    .fecha-rango {
+                    font-size: 0.95rem;
+                    color: var(--text-primary);
+                    font-weight: 500;
+                    }
+                }
+                }
+
+                .duracion-chip {
+                .duracion {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    background: var(--success-color);
+                    color: white;
+                    font-weight: 500;
+
+                    mat-icon {
+                    font-size: 1rem;
+                    width: 1rem;
+                    height: 1rem;
+                    }
+                }
+                }
+            }
+
+            // Sección de Precio
+            .precio-section {
+                text-align: center;
+                padding: 16px;
+                background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+                border-radius: 8px;
+                margin-bottom: 16px;
+
+                .precio-principal {
+                display: flex;
+                align-items: baseline;
+                justify-content: center;
+                gap: 4px;
+                margin-bottom: 4px;
+
+                .precio-valor {
+                    font-size: 2rem;
+                    font-weight: 700;
+                    color: var(--primary-color);
+                }
+
+                .precio-moneda {
+                    font-size: 1.2rem;
+                    font-weight: 500;
+                    color: var(--text-secondary);
+                }
+                }
+
+                .precio-detalle {
+                font-size: 0.9rem;
+                color: var(--text-secondary);
+                margin: 0;
+                font-style: italic;
+                }
+            }
+            }
+
+            // Acciones de la Card
+            .card-actions {
+            padding: 16px 24px;
+            background: var(--background-light);
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+            border-top: 1px solid #e0e0e0;
+
+            .btn-primary {
+                flex: 1;
+                font-weight: 600;
+                transition: var(--transition);
+
+                &:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-medium);
+                }
+            }
+
+            .btn-secondary {
+                color: var(--primary-color);
+                transition: var(--transition);
+
+                &:hover {
+                background: rgba(25, 118, 210, 0.1);
+                }
+            }
+
+            .btn-delete {
+                transition: var(--transition);
+
+                &:hover {
+                background: rgba(244, 67, 54, 0.1);
+                transform: scale(1.1);
+                }
+            }
+            }
+        }
+        }
+
+        // Estado Vacío
+        .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 64px 32px;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-light);
+        text-align: center;
+
+        .empty-icon {
+            font-size: 4rem;
+            width: 4rem;
+            height: 4rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            opacity: 0.6;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 1.1rem;
+        }
+
+        button {
+            transition: var(--transition);
+
+            &:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+            }
+        }
+        }
+    }
+}
+
+// Animaciones
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+@media (max-width: 768px) {
+    .lista-viajes-container {
+        padding: 16px;
+
+        .header-section .page-title {
+        font-size: 2rem;
+        }
+
+        .filtros-panel {
+        flex-direction: column;
+        align-items: stretch;
+
+        .filtro-busqueda,
+        .filtro-destino,
+        .filtro-precio {
+            min-width: unset;
+            width: 100%;
+        }
+        }
+
+        .viajes-grid .cards-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .lista-viajes-container {
+        padding: 12px;
+
+        .viajes-grid .cards-container .viaje-card {
+        .fechas-info {
+            flex-direction: column;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .card-actions {
+            flex-direction: column;
+            gap: 8px;
+
+            .btn-primary {
+            order: -1;
+            }
+        }
+        }
+    }
+}
