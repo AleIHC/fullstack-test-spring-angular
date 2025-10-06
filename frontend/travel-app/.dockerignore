@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+.angular
+dist
+coverage
+.nyc_output
+.DS_Store
+.vscode
+.idea
+*.log

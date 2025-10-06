@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: travelapp-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/travelapp/src/main/resources/db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  backend:
+    build: ./backend/travelapp
+    container_name: travelapp-backend
+    ports:
+      - "${SERVER_PORT}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SERVER_PORT: ${SERVER_PORT}
+      LOG_LEVEL: ${LOG_LEVEL}
+      SHOW_SQL: ${SHOW_SQL}
+      FORMAT_SQL: ${FORMAT_SQL}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/destinos"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  frontend:
+    build: ./frontend/travel-app
+    container_name: travelapp-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    environment:
+      - NGINX_HOST=${NGINX_HOST}
+      - NGINX_PORT=${NGINX_PORT}
+
+volumes:
+  postgres_data:
