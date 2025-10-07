@@ -15,6 +15,9 @@ import { ViajeService } from '../../services/viaje.service';
 import { DestinoService } from '../../services/destino.service';
 import { Viaje } from '../../models/viaje.model';
 import { Destino } from '../../models/destino.model';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ViajeModalComponent, ViajeModalData } from '../viaje-modal/viaje-modal.component';
+
 
 // Interfaz extendida para el componente
 interface ViajeEnriquecido extends Viaje {
@@ -36,6 +39,7 @@ interface ViajeEnriquecido extends Viaje {
     MatSliderModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    MatDialogModule,
     FormsModule
   ],
   templateUrl: './lista-viajes.component.html',
@@ -55,7 +59,8 @@ export class ListaViajesComponent implements OnInit {
 
   constructor(
     private readonly viajeService: ViajeService,
-    private readonly destinoService: DestinoService
+    private readonly destinoService: DestinoService,
+    private readonly dialog: MatDialog
   ) {}
 
   // Cargar datos al iniciar el componente
@@ -160,17 +165,24 @@ export class ListaViajesComponent implements OnInit {
   }
 
   verDetalleViaje(viaje: ViajeEnriquecido): void {
-    // TODO: Implementar modal o navegación a detalle
-    console.log('Ver detalle de viaje:', viaje);
-    alert(`Detalle del viaje a ${this.getDestinoNombre(viaje)}\nPrecio: $${viaje.precio}\nDuración: ${this.getDuracionViaje(viaje)} días`);
+    this.dialog.open(ViajeModalComponent, {
+      width: '600px',
+      data: { viaje, modo: 'ver' } as ViajeModalData
+    });
   }
 
   editarViaje(viaje: ViajeEnriquecido): void {
-    // TODO: Implementar modal de edición
-    console.log('Editar viaje:', viaje);
-    alert('Funcionalidad de edición próximamente');
-  }
+  const dialogRef = this.dialog.open(ViajeModalComponent, {
+    width: '600px',
+    data: { viaje, modo: 'editar' } as ViajeModalData
+  });
 
+  dialogRef.afterClosed().subscribe(result => {
+    if (result?.success) {
+      this.cargarViajes(); // Recargar la lista
+    }
+  });
+}
   // Eliminar viaje con confirmación
   eliminarViaje(viaje: ViajeEnriquecido): void {
     const destinoNombre = this.getDestinoNombre(viaje);
@@ -199,8 +211,16 @@ export class ListaViajesComponent implements OnInit {
   }
 
   crearNuevoViaje(): void {
-    // TODO: Implementar modal de creación
-    alert('Funcionalidad de creación próximamente');
+      const dialogRef = this.dialog.open(ViajeModalComponent, {
+      width: '600px',
+      data: { modo: 'crear' } as ViajeModalData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        this.cargarViajes(); // Recargar la lista
+      }
+    });
   }
 
   // Recargar la lista de viajes

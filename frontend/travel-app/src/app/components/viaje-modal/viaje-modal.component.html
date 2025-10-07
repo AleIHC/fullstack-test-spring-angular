@@ -1,0 +1,127 @@
+<div class="viaje-modal">
+    <!-- Header -->
+    <div class="modal-header">
+        <div class="header-content">
+        <mat-icon class="header-icon">{{iconoModal}}</mat-icon>
+        <h2 class="modal-title">{{tituloModal}}</h2>
+        </div>
+        <button mat-icon-button 
+                (click)="onCancelar()"
+                class="close-button"
+                matTooltip="Cerrar">
+        <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <!-- Contenido -->
+    <div class="modal-content">
+        <!-- Mensaje de Error -->
+        <div *ngIf="error" class="error-message">
+        <mat-icon>error</mat-icon>
+        <span>{{error}}</span>
+        </div>
+
+        <!-- Formulario -->
+        <form [formGroup]="viajeForm" class="viaje-form">
+        <!-- Selector -->
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Destino</mat-label>
+            <mat-select formControlName="destinoId" 
+                        [disabled]="!esFormularioEditable">
+            <mat-option *ngFor="let destino of destinos" [value]="destino.id">
+                <div class="destino-option">
+                📍 <span class="destino-nombre">{{destino.nombre}}</span>
+                <span class="destino-pais"> • {{destino.pais}}</span>
+                </div>
+            </mat-option>
+            </mat-select>
+            <mat-error>{{getErrorMessage('destinoId')}}</mat-error>
+        </mat-form-field>
+
+        <!-- Fechas -->
+        <div class="fechas-row">
+            <mat-form-field appearance="outline" class="fecha-field">
+            <mat-label>Fecha de Inicio</mat-label>
+            <input matInput 
+                    [matDatepicker]="pickerInicio"
+                    formControlName="fechaInicio"
+                    [readonly]="!esFormularioEditable">
+            <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+            <mat-datepicker #pickerInicio></mat-datepicker>
+            <mat-error>{{getErrorMessage('fechaInicio')}}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="fecha-field">
+            <mat-label>Fecha de Fin</mat-label>
+            <input matInput 
+                    [matDatepicker]="pickerFin"
+                    formControlName="fechaFin"
+                    [readonly]="!esFormularioEditable">
+            <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+            <mat-datepicker #pickerFin></mat-datepicker>
+            <mat-error>{{getErrorMessage('fechaFin')}}</mat-error>
+            </mat-form-field>
+        </div>
+
+        <!-- Error de fechas inválidas -->
+        <div *ngIf="viajeForm.hasError('fechasInvalidas')" class="form-error">
+            <mat-icon>warning</mat-icon>
+            La fecha de inicio debe ser anterior a la fecha de fin
+        </div>
+
+        <!-- Precio -->
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Precio</mat-label>
+            <input matInput 
+                type="number" 
+                formControlName="precio"
+                [readonly]="!esFormularioEditable"
+                min="0.01"
+                step="0.01">
+            <span matPrefix>$&nbsp;</span>
+            <span matSuffix>USD</span>
+            <mat-error>{{getErrorMessage('precio')}}</mat-error>
+        </mat-form-field>
+
+        <!-- Información del Viaje (solo si hay fechas válidas) -->
+        <div *ngIf="getDuracionViaje() > 0" class="viaje-info">
+            <div class="info-card">
+            <mat-icon>schedule</mat-icon>
+            <div class="info-content">
+                <span class="info-label">Duración del viaje</span>
+                <span class="info-value">{{getDuracionViaje()}} días</span>
+            </div>
+            </div>
+
+            <div class="info-card" *ngIf="viajeForm.get('destinoId')?.value">
+            <mat-icon>place</mat-icon>
+            <div class="info-content">
+                <span class="info-label">Destino seleccionado</span>
+                <span class="info-value">{{getDestinoNombre(viajeForm.get('destinoId')?.value)}}</span>
+            </div>
+            </div>
+        </div>
+        </form>
+    </div>
+
+    <!-- Acciones del Modal -->
+    <div class="modal-actions">
+        <button mat-button 
+                (click)="onCancelar()"
+                class="cancel-button">
+        <mat-icon>close</mat-icon>
+        Cancelar
+        </button>
+
+        <button *ngIf="esFormularioEditable"
+                mat-raised-button 
+                color="primary"
+                (click)="onGuardar()"
+                [disabled]="!esFormularioValido || loading"
+                class="save-button">
+        <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+        <mat-icon *ngIf="!loading">{{data.modo === 'crear' ? 'add' : 'save'}}</mat-icon>
+        {{data.modo === 'crear' ? 'Crear Viaje' : 'Guardar Cambios'}}
+        </button>
+    </div>
+</div>
