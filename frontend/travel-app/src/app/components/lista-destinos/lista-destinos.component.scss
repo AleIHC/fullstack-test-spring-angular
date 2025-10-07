@@ -322,8 +322,35 @@
 
             .actions-group {
                 display: flex;
-                gap: 4px;
+                gap: 8px;
                 justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+
+            .comprar-btn {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 0.875rem;
+                font-weight: 600;
+                transition: var(--transition);
+                background: linear-gradient(135deg, var(--accent-color), #e91e63);
+                color: white;
+                border: none;
+                box-shadow: var(--shadow-light);
+
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: var(--shadow-heavy);
+                    background: linear-gradient(135deg, #e91e63, var(--accent-color));
+                }
+
+                mat-icon {
+                    font-size: 1.1rem;
+                    width: 1.1rem;
+                    height: 1.1rem;
+                }
+            }
 
                 .action-btn {
                 transition: var(--transition);

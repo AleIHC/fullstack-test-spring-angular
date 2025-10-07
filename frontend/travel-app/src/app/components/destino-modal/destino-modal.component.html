@@ -1,10 +1,50 @@
 <div class="destino-modal">
   <h2 mat-dialog-title>
-    <mat-icon>{{ data.isEdit ? 'edit' : 'add' }}</mat-icon>
+    <mat-icon>{{ getIconoModal() }}</mat-icon>
     {{ titulo }}
   </h2>
 
-  <form [formGroup]="destinoForm" (ngSubmit)="onSubmit()">
+  <!-- Contenido específico para modo gestión -->
+  <div *ngIf="data.modo === 'gestion'" class="gestion-content">
+    <mat-dialog-content>
+      <h3>¿Qué deseas hacer con {{data.destino?.nombre}}?</h3>
+      
+      <div class="gestion-buttons">
+        <button mat-raised-button 
+                color="primary"
+                (click)="verDetalles()"
+                class="gestion-btn">
+          <mat-icon>visibility</mat-icon>
+          Ver Detalles
+        </button>
+        
+        <button mat-raised-button 
+                color="accent"
+                (click)="editarDestino()"
+                class="gestion-btn">
+          <mat-icon>edit</mat-icon>
+          Editar Destino
+        </button>
+        
+        <button mat-raised-button 
+                color="warn"
+                (click)="eliminarDestino()"
+                class="gestion-btn">
+          <mat-icon>delete</mat-icon>
+          Eliminar Destino
+        </button>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="onCancel()">
+        Cerrar
+      </button>
+    </mat-dialog-actions>
+  </div>
+
+  <!-- Formulario para crear/editar/ver -->
+  <form *ngIf="data.modo !== 'gestion'" [formGroup]="destinoForm" (ngSubmit)="onSubmit()">
     <mat-dialog-content>
       <!-- Error message -->
       <div *ngIf="error" class="error-message">
@@ -17,6 +57,7 @@
         <mat-label>Nombre del destino</mat-label>
         <input matInput 
                formControlName="nombre" 
+               [readonly]="data.modo === 'ver'"
                placeholder="Ej: Bogotá, París, Tokio">
         <mat-icon matSuffix>location_city</mat-icon>
         
@@ -34,6 +75,7 @@
         <mat-label>País</mat-label>
         <input matInput 
                formControlName="pais" 
+               [readonly]="data.modo === 'ver'"
                placeholder="Ej: Colombia, Francia, Japón">
         <mat-icon matSuffix>flag</mat-icon>
         
@@ -52,12 +94,13 @@
         Cancelar
       </button>
       
-      <button mat-raised-button 
+      <button *ngIf="data.modo !== 'ver'"
+              mat-raised-button 
               color="primary" 
               type="submit" 
               [disabled]="destinoForm.invalid || loading">
         <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
-        <mat-icon *ngIf="!loading">{{ data.isEdit ? 'save' : 'add' }}</mat-icon>
+        <mat-icon *ngIf="!loading">{{ getIconoSubmit() }}</mat-icon>
         {{ submitButtonText }}
       </button>
     </mat-dialog-actions>

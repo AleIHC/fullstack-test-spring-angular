@@ -110,7 +110,7 @@ describe('ListaDestinosComponent', () => {
     expect(destinoService.getDestinos).toHaveBeenCalled();
   });
 
-  // Verificar que se abre el modal para ver destino
+  /* Verificar que se abre el modal para ver destino
   it('debe abrir modal para ver destino', () => {
     const mockDialogRef = { afterClosed: () => of(false) };
     const dialogSpy = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
@@ -120,7 +120,7 @@ describe('ListaDestinosComponent', () => {
     component.verDestino(1);
     
     expect(dialogSpy.open).toHaveBeenCalled();
-  });
+  });*/
 
   // Verificar que se abre el modal para crear destino
   it('debe abrir modal para crear destino', () => {

@@ -12,7 +12,7 @@ import { Destino } from '../../models';
 
 export interface DestinoModalData {
   destino?: Destino;
-  isEdit: boolean;
+  modo: 'crear' | 'editar' | 'ver' | 'gestion'; 
 }
 
 @Component({
@@ -48,7 +48,7 @@ export class DestinoModalComponent implements OnInit {
 
   // Al inicializar, si es edición, cargar los datos del destino en el formulario
   ngOnInit(): void {
-    if (this.data.isEdit && this.data.destino) {
+    if ((this.data.modo === 'editar' || this.data.modo === 'ver') && this.data.destino) {
       this.destinoForm.patchValue({
         nombre: this.data.destino.nombre,
         pais: this.data.destino.pais
@@ -57,16 +57,32 @@ export class DestinoModalComponent implements OnInit {
   }
 
   get titulo(): string {
-    return this.data.isEdit ? 'Editar Destino' : 'Crear Nuevo Destino';
+    switch (this.data.modo) {
+      case 'crear': return 'Crear Nuevo Destino';
+      case 'editar': return 'Editar Destino';
+      case 'ver': return 'Detalles del Destino';
+      case 'gestion': return `Gestionar ${this.data.destino?.nombre}`;
+      default: return 'Destino';
+    }
   }
 
 
   get submitButtonText(): string {
-    return this.data.isEdit ? 'Actualizar' : 'Crear';
+    switch (this.data.modo) {
+      case 'crear': return 'Crear';
+      case 'editar': return 'Actualizar';
+      case 'gestion': return 'Cerrar';
+      default: return 'Guardar';
+    }
   }
 
   // Al enviar el formulario, crear o actualizar el destino
   onSubmit(): void {
+    if (this.data.modo === 'gestion') {
+      this.dialogRef.close();
+      return;
+    }
+
     if (this.destinoForm.valid) {
       this.loading = true;
       this.error = null;
@@ -76,11 +92,11 @@ export class DestinoModalComponent implements OnInit {
         pais: this.destinoForm.value.pais
       };
 
-      const operation = this.data.isEdit && this.data.destino?.id
+
+        const operation = this.data.modo === 'editar' && this.data.destino?.id
         ? this.destinoService.updateDestino(this.data.destino.id, destinoData)
         : this.destinoService.createDestino(destinoData);
       
-      // Suscribirse a la operación y manejar la respuesta y errores
       operation.subscribe({
         next: (result) => {
           this.loading = false;
@@ -107,5 +123,57 @@ export class DestinoModalComponent implements OnInit {
 
   get paisControl() {
     return this.destinoForm.get('pais');
+  }
+
+  // Métodos para obtener iconos según modo
+  getIconoModal(): string {
+    switch (this.data.modo) {
+      case 'crear': return 'add';
+      case 'editar': return 'edit';
+      case 'ver': return 'visibility';
+      case 'gestion': return 'settings';
+      default: return 'place';
+    }
+  }
+
+  getIconoSubmit(): string {
+    switch (this.data.modo) {
+      case 'crear': return 'add';
+      case 'editar': return 'save';
+      default: return 'save';
+    }
+  }
+
+
+  // Métodos para gestión
+  verDetalles(): void {
+    this.dialogRef.close({ action: 'ver', destino: this.data.destino });
+  }
+
+  editarDestino(): void {
+    this.dialogRef.close({ action: 'editar', destino: this.data.destino });
+  }
+
+  eliminarDestino(): void {
+    const nombre = this.data.destino?.nombre;
+    if (confirm(`¿Estás seguro de eliminar ${nombre}?`)) {
+      if (this.data.destino?.id) {
+        this.loading = true;
+        this.destinoService.deleteDestino(this.data.destino.id).subscribe({
+          next: () => {
+            this.dialogRef.close({ 
+              action: 'eliminar', 
+              success: true,
+              message: `${nombre} eliminado exitosamente`
+            });
+          },
+          error: (error) => {
+            console.error('Error al eliminar:', error);
+            this.error = 'Error al eliminar el destino';
+            this.loading = false;
+          }
+        });
+      }
+    }
   }
 }

@@ -13,10 +13,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { DestinoModalComponent, DestinoModalData } from '../destino-modal/destino-modal.component';
-
 import { DestinoService } from '../../services/destino.service';
 import { Destino, RespuestaPaginada } from '../../models';
-
+import { ViajeModalComponent, ViajeModalData } from '../viaje-modal/viaje-modal.component';
 
 @Component({
   selector: 'app-lista-destinos',
@@ -45,7 +44,7 @@ export class ListaDestinosComponent implements OnInit {
   error: string | null = null;
 
   // Tabla
-  displayedColumns: string[] = ['id', 'nombre', 'pais', 'estado', 'acciones'];
+  displayedColumns: string[] = ['nombre', 'pais', 'estado', 'acciones'];
 
   // Paginación
   totalElements: number = 0;
@@ -124,27 +123,11 @@ export class ListaDestinosComponent implements OnInit {
     this.cargarDestinos();
   }
 
-  // Al eliminar
-  eliminarDestino(id: number): void {
-    if (confirm('¿Estás seguro de eliminar este destino?')) {
-      this.loading = true;
-      this.destinoService.deleteDestino(id).subscribe({
-        next: () => {
-          this.cargarDestinos();
-        },
-        error: (error) => {
-          this.error = 'Error al eliminar destino';
-          this.loading = false;
-          console.error('Error:', error);
-        }
-      });
-    }
-  }
-
+  // Al crear nuevo destino
   crearDestino(): void {
     const dialogRef = this.dialog.open(DestinoModalComponent, {
       width: '500px',
-      data: { isEdit: false } as DestinoModalData
+      data: { modo: 'crear' } as DestinoModalData
     });
 
     // Una vez que se cierra el modal, recargar la lista si se creó un destino
@@ -155,25 +138,97 @@ export class ListaDestinosComponent implements OnInit {
     });
   }
 
-  editarDestino(id: number): void {
-    // Buscar destino por id
-    const destino = this.destinos.find(d => d.id === id);
-    if (!destino) return;
+  reservarViaje(destino: Destino): void {
+    const dialogData: ViajeModalData = {
+      modo: 'crear',
+      viaje: {
+        destinoId: destino.id!,
+        destinoNombre: destino.nombre,
+        fechaInicio: '',
+        fechaFin: '',
+        precio: this.getPrecioSugerido(destino)
+      }
+    };
 
-    const dialogRef = this.dialog.open(DestinoModalComponent, {
-      width: '500px',
-      data: { destino, isEdit: true } as DestinoModalData
+    const dialogRef = this.dialog.open(ViajeModalComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: dialogData,
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Una vez que se editó, recargar la lista
-      this.cargarDestinos();
+      if (result?.success) {
+        this.mostrarMensajeExito(`¡Viaje a ${destino.nombre}, ${destino.pais} reservado exitosamente!`);
       }
     });
   }
 
-  verDestino(id: number): void {
-    this.editarDestino(id);
+  // Métodos para gestionar a través del modal
+  gestionarDestino(destino: Destino): void {
+    const dialogRef = this.dialog.open(DestinoModalComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      data: { destino: destino, modo: 'gestion' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.action) {
+        this.procesarAccionGestion(result, destino);
+      }
+    });
+  }
+
+  private procesarAccionGestion(result: any, destino: Destino): void {
+    switch (result.action) {
+      case 'ver':
+        this.abrirModalVer(destino);
+        break;
+      case 'editar':
+        this.abrirModalEditar(destino);
+        break;
+      case 'eliminar':
+        if (result.success) {
+          this.cargarDestinos();
+          this.mostrarMensajeExito(`Destino ${destino.nombre} eliminado`);
+        }
+        break;
+    }
+  }
+
+  private abrirModalVer(destino: Destino): void {
+    this.dialog.open(DestinoModalComponent, {
+      width: '500px',
+      data: { destino, modo: 'ver' }
+    });
+  }
+
+  private abrirModalEditar(destino: Destino): void {
+    const dialogRef = this.dialog.open(DestinoModalComponent, {
+      width: '500px',
+      data: { destino, modo: 'editar' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.cargarDestinos();
+        this.mostrarMensajeExito(`Destino ${destino.nombre} actualizado`);
+      }
+    });
+  }
+
+  // Mostrar mensaje (alerta)
+  private mostrarMensajeExito(mensaje: string): void {
+    alert(mensaje);
+  }
+
+  // Método preliminar para sugerir precio
+  private getPrecioSugerido(destino: Destino): number {
+    // Por ahora, precios simples por categoría
+    const preciosBasicos = [800, 900, 1000, 1100, 1200, 1300, 1400, 1500];
+    
+    // Usar el ID del destino para generar un precio "consistente"
+    const index = (destino.id || 1) % preciosBasicos.length;
+    return preciosBasicos[index];
   }
 }
