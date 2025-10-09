@@ -1,17 +1,21 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AppComponent } from './app.component';
+import { ActivatedRoute } from '@angular/router';
+
 
 describe('AppComponent', () => {
-
-  // Configuración antes de cada test
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
-        provideHttpClient(),
-        provideHttpClientTesting()
+        { 
+          provide: ActivatedRoute, 
+          useValue: { 
+            snapshot: { params: {} },
+            queryParams: {},
+            params: {}
+          } 
+        }  
       ]
     }).compileComponents();
   });

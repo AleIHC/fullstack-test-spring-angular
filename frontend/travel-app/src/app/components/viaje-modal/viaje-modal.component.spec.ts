@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ViajeModalComponent } from './viaje-modal.component';
 
 describe('ViajeModalComponent', () => {
@@ -8,7 +10,13 @@ describe('ViajeModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ViajeModalComponent]
+      imports: [ViajeModalComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
+        { provide: MAT_DIALOG_DATA, useValue: { modo: 'crear' } }  // ⬅️ Agregar estos providers
+      ]
     })
     .compileComponents();
 

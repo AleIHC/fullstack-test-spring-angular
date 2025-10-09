@@ -61,10 +61,12 @@ export class ListaDestinosComponent implements OnInit {
     private readonly dialog: MatDialog
   ) {}
 
+  // Inicialización
   ngOnInit(): void {
     this.cargarDestinos();
   }
 
+  // Cargar destinos con parámetros actuales
   cargarDestinos(): void {
     this.loading = true;
     this.error = null;
@@ -130,7 +132,7 @@ export class ListaDestinosComponent implements OnInit {
       data: { modo: 'crear' } as DestinoModalData
     });
 
-    // Una vez que se cierra el modal, recargar la lista si se creó un destino
+    // Al cerrar el modal, recargar la lista si se creó un destino
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.cargarDestinos();
@@ -138,6 +140,7 @@ export class ListaDestinosComponent implements OnInit {
     });
   }
 
+  // Al reservar viaje
   reservarViaje(destino: Destino): void {
     const dialogData: ViajeModalData = {
       modo: 'crear',
@@ -179,7 +182,8 @@ export class ListaDestinosComponent implements OnInit {
     });
   }
 
-  private procesarAccionGestion(result: any, destino: Destino): void {
+  // Procesar acción seleccionada en gestión
+  procesarAccionGestion(result: any, destino: Destino): void {
     switch (result.action) {
       case 'ver':
         this.abrirModalVer(destino);
@@ -196,14 +200,16 @@ export class ListaDestinosComponent implements OnInit {
     }
   }
 
-  private abrirModalVer(destino: Destino): void {
+  // Modal para ver destino
+  abrirModalVer(destino: Destino): void {
     this.dialog.open(DestinoModalComponent, {
       width: '500px',
       data: { destino, modo: 'ver' }
     });
   }
 
-  private abrirModalEditar(destino: Destino): void {
+  // Modal para editar destino
+  abrirModalEditar(destino: Destino): void {
     const dialogRef = this.dialog.open(DestinoModalComponent, {
       width: '500px',
       data: { destino, modo: 'editar' }
@@ -218,16 +224,15 @@ export class ListaDestinosComponent implements OnInit {
   }
 
   // Mostrar mensaje (alerta)
-  private mostrarMensajeExito(mensaje: string): void {
+  mostrarMensajeExito(mensaje: string): void {
     alert(mensaje);
   }
 
   // Método preliminar para sugerir precio
-  private getPrecioSugerido(destino: Destino): number {
-    // Por ahora, precios simples por categoría
+  getPrecioSugerido(destino: Destino): number {
+    // Lista de precios básicos
     const preciosBasicos = [800, 900, 1000, 1100, 1200, 1300, 1400, 1500];
     
-    // Usar el ID del destino para generar un precio "consistente"
     const index = (destino.id || 1) % preciosBasicos.length;
     return preciosBasicos[index];
   }

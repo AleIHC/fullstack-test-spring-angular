@@ -30,4 +30,6 @@ describe('DestinoModalComponent', () => {
   it('debe crear el componente', () => {
     expect(component).toBeTruthy();
   });
+
+  
 });

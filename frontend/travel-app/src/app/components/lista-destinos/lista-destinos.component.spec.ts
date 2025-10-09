@@ -6,6 +6,8 @@ import { of, throwError } from 'rxjs';
 import { ListaDestinosComponent } from './lista-destinos.component';
 import { DestinoService } from '../../services/destino.service';
 import { RespuestaPaginada, Destino } from '../../models';
+import { DestinoModalComponent } from '../destino-modal/destino-modal.component';
+import { ViajeModalComponent } from '../viaje-modal/viaje-modal.component';
 
 
 
@@ -110,18 +112,6 @@ describe('ListaDestinosComponent', () => {
     expect(destinoService.getDestinos).toHaveBeenCalled();
   });
 
-  /* Verificar que se abre el modal para ver destino
-  it('debe abrir modal para ver destino', () => {
-    const mockDialogRef = { afterClosed: () => of(false) };
-    const dialogSpy = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
-    dialogSpy.open.and.returnValue(mockDialogRef as any);
-    
-    component.destinos = [{ id: 1, nombre: 'Test', pais: 'Test Country' }];
-    component.verDestino(1);
-    
-    expect(dialogSpy.open).toHaveBeenCalled();
-  });*/
-
   // Verificar que se abre el modal para crear destino
   it('debe abrir modal para crear destino', () => {
     const mockDialogRef = { afterClosed: () => of(true) };
@@ -141,6 +131,109 @@ describe('ListaDestinosComponent', () => {
     
     expect(component.error).toBe('Error al cargar destinos');
     expect(component.loading).toBeFalsy();
+  });
+  
+  // Verificar que se abre el modal de gestión de destino
+  it('debe abrir modal de gestión de destino', () => {
+    const mockDialogRef = { afterClosed: () => of(null) };
+    const dialogSpy = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
+    dialogSpy.open.and.returnValue(mockDialogRef as any);
+    
+    const destino = { id: 1, nombre: 'Test', pais: 'Test Country' };
+    component.gestionarDestino(destino);
+    
+    expect(dialogSpy.open).toHaveBeenCalledWith(DestinoModalComponent, {
+      width: '500px',
+      maxWidth: '90vw', 
+      data: { destino: destino, modo: 'gestion' }
+    });
+  });
+
+  // Verificar que se abre el modal para reservar viaje con destino preseleccionado
+  it('debe abrir modal para reservar viaje con destino preseleccionado', () => {
+    const mockDialogRef = { afterClosed: () => of({ success: true }) };
+    const dialogSpy = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
+    dialogSpy.open.and.returnValue(mockDialogRef as any);
+    
+    const destino: Destino = { id: 1, nombre: 'Bagan', pais: 'Myanmar' };
+    component.reservarViaje(destino);
+    
+    expect(dialogSpy.open).toHaveBeenCalledWith(ViajeModalComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: {
+        modo: 'crear',
+        viaje: {
+          destinoId: 1,
+          destinoNombre: 'Bagan',
+          fechaInicio: '',
+          fechaFin: '',
+          precio: jasmine.any(Number) 
+        }
+      },
+      disableClose: true
+    });
+  });
+
+
+  // Verificar onSort con sort activo y dirección válida
+  it('debe manejar onSort con sort activo y direccion válida', () => {
+    const sortEvent = { active: 'nombre', direction: 'asc' } as any;
+    component.onSort(sortEvent);
+    
+    expect(component.sortColumn).toBe('nombre');
+    expect(component.sortDirection).toBe('asc');
+  });
+
+  // cuando onSort no está activo o no tiene dirección
+  it('debe manejar onSort con sort inactivo o sin dirección', () => {
+    const sortEvent = { active: '', direction: '' } as any;
+    component.onSort(sortEvent);
+    
+    expect(component.sortColumn).toBe('nombre');
+    expect(component.sortDirection).toBe('asc');
+  });
+
+  // Probar las diferentes acciones del switch en procesarAccionGestion
+  it('debe procesar acción "editar" exitosamente', () => {
+    const result = { action: 'editar', success: true };
+    const destino = { id: 1, nombre: 'Test', pais: 'Test' };
+    
+    const mockDialogRef = { afterClosed: () => of(true) };
+    const dialogSpy = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
+    dialogSpy.open.and.returnValue(mockDialogRef as any);
+    
+    spyOn(component, 'cargarDestinos');
+    component.procesarAccionGestion(result, destino);
+    
+    expect(dialogSpy.open).toHaveBeenCalled();
+    expect(component.cargarDestinos).toHaveBeenCalled();
+  });
+
+  // Verificar si acción eliminar llama a cargarDestinos
+  it('debe procesar acción "eliminar" exitosamente', () => {
+    const result = { action: 'eliminar', success: true };
+    const destino = { id: 1, nombre: 'Test', pais: 'Test' };
+    
+    spyOn(component, 'cargarDestinos');
+    spyOn(component, 'mostrarMensajeExito');
+    
+    component.procesarAccionGestion(result, destino);
+    
+    expect(component.cargarDestinos).toHaveBeenCalled();
+    expect(component.mostrarMensajeExito).toHaveBeenCalledWith('Destino Test eliminado');
+  });
+
+  // Verificar precio sugerido con y sin ID
+  it('debe probar getPrecioSugerido con diferentes valores de ID', () => {
+
+    const destinoSinId = { nombre: 'Test', pais: 'Test' };
+    const precio1 = component.getPrecioSugerido(destinoSinId);
+    expect(precio1).toBeGreaterThan(0);
+
+    const destinoConId = { id: 5, nombre: 'Test', pais: 'Test' };
+    const precio2 = component.getPrecioSugerido(destinoConId);
+    expect(precio2).toBeGreaterThan(0);
   });
 });
 
